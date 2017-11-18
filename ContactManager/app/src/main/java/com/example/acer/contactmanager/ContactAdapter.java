@@ -23,6 +23,8 @@ public class ContactAdapter extends BaseAdapter {
     Context context;
     int myLayout;
 
+    callPhone callPhone;
+
     public ContactAdapter(ArrayList<Contact> listContact, Context context, int myLayout) {
         this.listContact = listContact;
         this.context = context;
@@ -48,7 +50,7 @@ public class ContactAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = view;
         ViewHoler viewHoler;
-        if(v == null){
+        if (v == null) {
 
             LayoutInflater inflater = LayoutInflater.from(context);
             v = inflater.inflate(myLayout, null);
@@ -62,20 +64,25 @@ public class ContactAdapter extends BaseAdapter {
             viewHoler.imgbtnSMS = v.findViewById(R.id.imgbtnSMS);
 
             v.setTag(viewHoler);
-        }else viewHoler = (ViewHoler) v.getTag();
+        } else viewHoler = (ViewHoler) v.getTag();
 
 
         final Contact contact = listContact.get(i);
-        if(contact.getAvatar()!= null){
+        if (contact.getAvatar() != null) {
             viewHoler.imvAvatar.setImageBitmap(contact.getAvatar());
-        }else viewHoler.imvAvatar.setImageResource(R.mipmap.ic_launcher);
+        } else viewHoler.imvAvatar.setImageResource(R.mipmap.ic_launcher);
         viewHoler.tvName.setText(contact.getName());
         viewHoler.tvPhone.setText(contact.getPhoneNumber());
         viewHoler.tvEmail.setText(contact.getEmail());
         viewHoler.imgbtnCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doCall(contact.getPhoneNumber());
+                try {
+                    callPhone = (com.example.acer.contactmanager.callPhone) context.getApplicationContext();
+                    callPhone.doCall(contact);
+                }catch (ClassCastException cce){
+                    cce.printStackTrace();
+                }
             }
         });
 
@@ -89,19 +96,18 @@ public class ContactAdapter extends BaseAdapter {
     }
 
     private void doSms(String phoneNumber) {
-        Toast.makeText(context, "Chưa làm "+phoneNumber, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Chưa làm " + phoneNumber, Toast.LENGTH_SHORT).show();
     }
 
-    private void doCall(String phoneNumber) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:"+phoneNumber));
-        context.startActivity(intent);
-    }
 
-    public class ViewHoler{
+    public class ViewHoler {
         private ImageView imvAvatar;
         private TextView tvName, tvPhone, tvEmail;
         private ImageButton imgbtnSMS, imgbtnCall;
     }
+
+
+}
+interface callPhone{
+    public void doCall(Contact contact);
 }
